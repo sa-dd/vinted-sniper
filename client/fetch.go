@@ -7,43 +7,18 @@ import (
 	"net/http"
 )
 
-type VintedResponse struct {
-	Items []VintedItem `json:"items"`
-}
-
-type VintedItem struct {
-	ID        int64  `json:"id"`
-	Title     string `json:"title"`
-	URL       string `json:"url"`
-	Status    string `json:"status"`
-	SizeTitle string `json:"size_title"`
-	User      struct {
-		Login string `json:"login"`
-	} `json:"user"`
-	Photo struct {
-		URL string `json:"url"`
-	} `json:"photo"`
-	Price struct {
-		Amount       string `json:"amount"`
-		CurrencyCode string `json:"currency_code"`
-	} `json:"price"`
-}
-
-func FetchVintedItems(client *http.Client) ([]VintedItem, error) {
-	const vintedURL = "https://www.vinted.co.uk/api/v2/catalog/items?page=1&per_page=96&time=1758397863&global_search_session_id=d9bc1e4f-6b8d-45a1-90d8-fb8a041ef637&search_text=uggs+slippers&catalog_ids=&order=newest_first&size_ids=&brand_ids=&status_ids=&color_ids=&material_ids="
-
-	req, err := http.NewRequest("GET", vintedURL, nil)
+func FetchItems(client *http.Client, url string) ([]Item, error) {
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("create request failed: %w", err)
 	}
 
-	// Set required headers
 	req.Header = http.Header{
 		"authority":          {"www.vinted.co.uk"},
 		"accept":             {"application/json, text/plain, */*"},
 		"accept-language":    {"en-uk-fr"},
 		"cache-control":      {"max-age=0"},
-		"cookie":             {"v_udt=L2JGTWk0RHJmVWN2QUYzVDZRaXFrVkFGTFBXci0tejE0bzlkb09USjVucHNEZi0tSk40aXhySHV6U0pBMEpQdXBvNERTUT09; anon_id=2c165bcb-8951-4dfc-8c70-7fab5d7847f7; anonymous-locale=en-uk-fr; access_token_web=eyJraWQiOiJFNTdZZHJ1SHBsQWp1MmNObzFEb3JIM2oyN0J1NS1zX09QNVB3UGlobjVNIiwiYWxnIjoiUFMyNTYifQ.eyJhcHBfaWQiOjQsImF1ZCI6ImZyLmNvcmUuYXBpIiwiY2xpZW50X2lkIjoid2ViIiwiZXhwIjoxNzU4NDA3NjgxLCJpYXQiOjE3NTg0MDA0ODEsImlzcyI6InZpbnRlZC1pYW0tc2VydmljZSIsInB1cnBvc2UiOiJhY2Nlc3MiLCJzY29wZSI6InB1YmxpYyIsInNpZCI6ImFmYWM0MGM3LTE3NTg0MDA0ODEifQ.YH427er3ce_qRR1WLDzF2_-TRD7IkuIbSvKlaZi1Qc5SNEEb0vYRdA40z7kby22l7tVhYa5bPlxSlLti6jGDjV2ladxVe0lwxZZ8ZAl77dDIZZSpMJlmT7737fHE-Ux41gJoOACDzI_XD-Zw-5-YF7eQJEDwKWEKf6v0BtgWpb16UOW-CBRsDaA5z_huuKujvovjCGKAOLB0S2LhbMXggCag0bvll6D2ADdaUoj94jrTfDLnMCtKunzffmv53fE2RHxAilTdWzXYnjliX3RbSrTqG6sV4JK5x4qj6hY18IzkKlvSjTHuRdoJF4W6LruQN7CJ4cbEHr-qgOBaanuA9A; refresh_token_web=eyJraWQiOiJFNTdZZHJ1SHBsQWp1MmNObzFEb3JIM2oyN0J1NS1zX09QNVB3UGlobjVNIiwiYWxnIjoiUFMyNTYifQ.eyJhcHBfaWQiOjQsImF1ZCI6ImZyLmNvcmUuYXBpIiwiY2xpZW50X2lkIjoid2ViIiwiZXhwIjoxNzU5MDA1MjgxLCJpYXQiOjE3NTg0MDA0ODEsImlzcyI6InZpbnRlZC1pYW0tc2VydmljZSIsInB1cnBvc2UiOiJyZWZyZXNoIiwic2NvcGUiOiJwdWJsaWMiLCJzaWQiOiJhZmFjNDBjNy0xNzU4NDAwNDgxIn0.hTZysPc80sDo2mhOl58oLub8Et1zR_0w3g_g-CmV98MUQnOuBu1rMob4yZyE_cCDMqb0h7cCL0AV08rFuU78bekCBkqSlQ2e9sI2xlJbWQstCUA64WsFFU1w1kxOa4AHpdkggrQ6us2ZuexpxwkxGuXOLiwOic1RjlSGJs9s2M3swtsOu-l3QeBOs-JWbtzNfyUAIxsR6puyQ0mfxx3Zk7TxuHv0w8De7XhbEj3COpVVzGd34szBVZ_aTQwZPLLUZ9_FSFSHZzSmha8fR_aTB-8Lbw7iOXEHaARIW4mQyOJGvbbN47UDvl-X_QzIYCDB4ncDTQXr7lGG5y4cBiDQJQ; anon_id=60cbd6a4-9b5c-4d35-81bc-957fc2373e88; __cf_bm=3uVc.Hq8hPwwaMYxE87lsdOK.qVJLsiDODLNdp31fi8-1758400483-1.0.1.1-1FkC5Aw1MrjPyZhelO0vlujHaiHm66QGPPg_gpEN6W2OEjOezTMQ9jyqu7dvm8Y8TmuGenBaW1SZRBo_Zew0x9ItIcaDf81PJw1bZKw5U_RLs..pXGSISvJ8hD0i4opb; cf_clearance=SwVbLAWzqE03JbqDkHXOnlctuc2_ppOrtsbnNK_.PXA-1758400484-1.2.1.1-h0cQZcrrJQ1fWpKfRYPl26dP.Vh2LKYz.pnm2kT8ucI1B5YueLXp6i49RFHjXPenba7isVPWhUZa_OUAOtQd_.ZMr.pbiQoPrA3y44D70GubQlFi1Z9Kp.vNgh1o7p5pTqZml3DEQLtpi9ZC6apTkscvLCjSsbnZ1cqJkVyiIS1FQh9F0I_G0IcGh5EL5.s_l3Vb7Q7aXMS9nk5vCvbHD16gvPpE15RpyA3Yb7l8Gok; viewport_size=677; v_sid=e1dad7acf68ce1604789335976e4ce9e; OptanonAlertBoxClosed=2025-09-20T20:34:47.490Z; eupubconsent-v2=CQYCsRgQYCsRgAcABBENB9FgAAAAAEPgAAwIAAAWZABMNCogjLIgBCJQMAIEACgrCACgQBAAAkDRAQAmDApyBgAusJkAIAUAAwQAgABBgACAAASABCIAKACAQAAQCBQABgAQBAQAMDAAGACxEAgABAdAxTAggECwASMyqDTAlAASCAlsqEEgCBBXCEIs8AggREwUAAAIABQEAADwWAhJICViQQBcQTQAAEAAAUQIECKRswBBQGaLQXgyfRkaYBg-YJklMgyAJgjIyTYhN-Ew8UhRAAAA.YAAACHwAAAAA; OTAdditionalConsentString=1~; OptanonConsent=isGpcEnabled=0&datestamp=Sat+Sep+20+2025+21%3A35%3A14+GMT%2B0100+(British+Summer+Time)&version=202508.2.0&browserGpcFlag=0&isIABGlobal=false&consentId=2c165bcb-8951-4dfc-8c70-7fab5d7847f7&identifierType=Cookie+Unique+Id&isAnonUser=1&hosts=&interactionCount=1&landingPath=NotLandingPage&groups=C0001%3A1%2CC0002%3A0%2CC0003%3A0%2CC0004%3A0%2CC0005%3A0%2CV2STACK42%3A0%2CC0015%3A0%2CC0035%3A0%2CC0038%3A0&genVendors=V2%3A0%2CV1%3A0%2C&intType=2&geolocation=GB%3BENG&AwaitingReconsent=false; banners_ui_state=SUCCESS; datadome=nXJD0p9zPeWgCIWVEQDnSOntFurT2frb6YRE51DydF6P7R0kbKfYAtpmMx~Wfar8zhXLBfv1zC2FOd8n_LR9nYNyIuFVbXksFqD2XOFxOy3Yd5EqMPTXcjTC5d~hkPcQ; _vinted_fr_session=VFc3cWliZ0ZoWGdObkdwSit1dzB6MEZ3dDQvZmFxK2gzU3E5bHdJY2U3UEJjN3hsdDlBbmlERnkvS2JCU1plbVZVOUtaWlM2cy8wS2liWGtTTGEyazRBU1lVV2Y2b1FvU3BrT2wwZmorRmlZZk9uTmxBUlh6RWpnZ2pLQU9uMGdnUW5lV0x4WHdZdWtPanFtQVVpMnRZZGtEYkQ0MldtMEt0ejhNaUo4OGVaZWVJSGw0RVVlODhIY1J5YldHK20vaWZRY1p2WlRGWVBnNzNLK2Q4eWEweVN5c2U3THJ2VXdTVFMyenFCVis5TXVqS0Y5WEhCZFNwL1hwQmRhWlNpaS0telh2RXIvajR0VjZRVG0rOHk1S1Q0QT09--e0e081c7d4d66dc655160ea2dab44526af0315d7"}, // Get cookie from env
+		"cookie":             {"v_udt=L2JGTWk0RHJmVWN2QUYzVDZRaXFrVkFGTFBXci0tejE0bzlkb09USjVucHNEZi0tSk40aXhySHV6U0pBMEpQdXBvNERTUT09; anon_id=2c165bcb-8951-4dfc-8c70-7fab5d7847f7; anonymous-locale=en-uk-fr; anon_id=60cbd6a4-9b5c-4d35-81bc-957fc2373e88; OptanonAlertBoxClosed=2025-09-20T20:34:47.490Z; eupubconsent-v2=CQYCsRgQYCsRgAcABBENB9FgAAAAAEPgAAwIAAAWZABMNCogjLIgBCJQMAIEACgrCACgQBAAAkDRAQAmDApyBgAusJkAIAUAAwQAgABBgACAAASABCIAKACAQAAQCBQABgAQBAQAMDAAGACxEAgABAdAxTAggECwASMyqDTAlAASCAlsqEEgCBBXCEIs8AggREwUAAAIABQEAADwWAhJICViQQBcQTQAAEAAAUQIECKRswBBQGaLQXgyfRkaYBg-YJklMgyAJgjIyTYhN-Ew8UhRAAAA.YAAACHwAAAAA; OTAdditionalConsentString=1~; domain_selected=true; v_sid=afac40c7-1758400481; __eoi=ID=b7a26f62587f6978:T=1758461422:RT=1758461422:S=AA-AfjYzxoJxDzH3g-xwt4eCnWch; monetixads-user-session=250101575373614000053736516982151230; sharedid=7650805c-a780-4c94-9ea4-3c70a6754b05; sharedid_cst=A8%2BRZw%3D%3D; __cf_bm=iDt_W7LmNTCOrkKXnZ2Cn8jMrxrLqWMvxUk71DVFxa0-1758468456-1.0.1.1-1qbGf73jz6txMtrsmngZOsosAbXaAsviBYp7g1Rc7gv3dUjl.Y9M_5aj7UZPWKClEHEcjwDBdGeWqSoH1pV2BTYJcd63HHkStzjVya3oue0BqZDUraw9VIj8r0G.NgIb; cf_clearance=6UUWFSLVVfY5jgfYouIdHDijE4794RbsKIPtgkYfPuE-1758468456-1.2.1.1-EDB_0OKP9KCJYzWEOJparGNZm3fExYeFQT01C.JYUwzB_oSqNbDC_W.LHi8KK2.YLwONfstFL.SZ8bExj6IxheY8.CAUJ2ZNXS_CWCFcmCkPYPtV8D4TONjDBGGt8c2ROe0FOQYR28OYiAtn4XTOEH1ht3auwsEqy20s3YhySHd9aZtopYG8SXzDeXsmQXSN8k5fKRElcfZVXZCebsjLZkrUcequpI_TH08y.U_QP_Y; access_token_web=eyJraWQiOiJFNTdZZHJ1SHBsQWp1MmNObzFEb3JIM2oyN0J1NS1zX09QNVB3UGlobjVNIiwiYWxnIjoiUFMyNTYifQ.eyJhcHBfaWQiOjQsImF1ZCI6ImZyLmNvcmUuYXBpIiwiY2xpZW50X2lkIjoid2ViIiwiZXhwIjoxNzU4NDc1NjU3LCJpYXQiOjE3NTg0Njg0NTcsImlzcyI6InZpbnRlZC1pYW0tc2VydmljZSIsInB1cnBvc2UiOiJhY2Nlc3MiLCJzY29wZSI6InB1YmxpYyIsInNpZCI6ImFmYWM0MGM3LTE3NTg0MDA0ODEifQ.Hrpphn3qsRrGU-Z1GZKJ14R8DuuR-Tu1SSzE0C3G1Bab9lvaZUcjKYj_khWbGMt4dfMR3U8mocDcdVY5FK4lIP8J2S1zPSIdDcTx-RUyC3c2gSIuB6sDQwbm_nkywFCa08tk9qf7sghsA3F_PRbfkU9ZX76hPByYl2V9Ond8U1frYhAITtMdgWmUGdviFrOf4pY9WWx1sYoREdUMITvhkhF1a5KTr5N3CjXB_oafIaeqbFZ1mGttRkMfqjqDovbbmFK4dxHA0H4vgnN6I2x-yAjg86M5ZFdryd3lVb4fAKkCH27NOFjjwkuhxHtb9NQgb8EG2-z8lCfuFml6P0WSgw; refresh_token_web=eyJraWQiOiJFNTdZZHJ1SHBsQWp1MmNObzFEb3JIM2oyN0J1NS1zX09QNVB3UGlobjVNIiwiYWxnIjoiUFMyNTYifQ.eyJhcHBfaWQiOjQsImF1ZCI6ImZyLmNvcmUuYXBpIiwiY2xpZW50X2lkIjoid2ViIiwiZXhwIjoxNzU5MDczMjU3LCJpYXQiOjE3NTg0Njg0NTcsImlzcyI6InZpbnRlZC1pYW0tc2VydmljZSIsInB1cnBvc2UiOiJyZWZyZXNoIiwic2NvcGUiOiJwdWJsaWMiLCJzaWQiOiJhZmFjNDBjNy0xNzU4NDAwNDgxIn0.sVbp1PO3FNIQmbaRoHL5h5R_JF-blE58Xh8KxFv_jt-io8qeXRzOqFcnz79EOEIaFKHQIb6K3lIsNfF6T9ViPjNycIJ5__aQtSkytSH2octKSDf73CTr3vGvlerZaHMrVj9ftY2qMFRDcfFsw9SGYp71s2G4PFIYLwuQ0Slu1EL6bgae0dbSbLvhK2_Gpi_O80Xky4Rgh7z9bLo3C5Tv3lELM-aZBeT1s5Ga0IIHuVKaggrMpxYoikqBlDT38VLthJZl-BrLvQnF4jiMdiV5IYluHQ6Vke1K_KMbhJDUMuUyoCJ3vGZ4s3btVE_OLmu5E7KPR6ybQinVCaV9BgR5pw; homepage_session_id=a72b43e9-41d4-4522-a29d-b0189ba24f8a; viewport_size=637; OptanonConsent=isGpcEnabled=0&datestamp=Sun+Sep+21+2025+16%3A27%3A50+GMT%2B0100+(British+Summer+Time)&version=202508.2.0&browserGpcFlag=0&isIABGlobal=false&consentId=2c165bcb-8951-4dfc-8c70-7fab5d7847f7&identifierType=Cookie+Unique+Id&isAnonUser=1&hosts=&interactionCount=1&landingPath=NotLandingPage&groups=C0001%3A1%2CC0002%3A0%2CC0003%3A0%2CC0004%3A0%2CC0005%3A0%2CV2STACK42%3A0%2CC0015%3A0%2CC0035%3A0%2CC0038%3A0&genVendors=V2%3A0%2CV1%3A0%2C&intType=2&geolocation=GB%3BENG&AwaitingReconsent=false; banners_ui_state=SUCCESS; datadome=O1GbaPzX9QYC4cUNlcDg8UWAMTHsBwEl4ps4G3jBoC7L~kRqzrfeM4SbEnS4s~QyA88s0bJImzHgRMlghcZIpxyH3OirO7XpNof8KQCQsHQPmHwBZOJlOI2~yQ14n5Id; _vinted_fr_session=MUgxRHZmVS9xWFNCRmJlYzVqNEJXT0dNaXlrUGhOSHNUYktvdUpLWWJmVXZyemVBWVJJVEdYODQwSTduUjRuejVGazdySDh4dkJ1OXFtQ0l2eEsyb21iVXN2Z1V6ejhVS0R2REx6RUxYWWI2eUFuOEg5VkpiQnlqa1VyVml2SGJEMU5lN2FXc0lmOTc0aXpDaENyeXRDVm9sejh3VkZDby9QVmpDNlV3RTdob0VBa0pSQVZJODZrdENwR2NsbkVZQmZQVFVLYkJab0JUMGE0NmZTWWhSSjVPTm55WXBuZUpFUm5lem1FOE9GOD0tLTNGN3NobmY1UHRuNEhwWnJWTHpVUFE9PQ%3D%3D--1ecac438f16154bb3b2bffe8fd227941fab6cc65"}, // Get cookie from env
 		"priority":           {"u=1, i"},
 		"referer":            {"https://www.vinted.co.uk/catalog"},
 		"sec-ch-ua":          {"\"Chromium\";v=\"136\", \"Microsoft Edge\";v=\"136\", \"Not.A/Brand\";v=\"99\""},
@@ -73,7 +48,7 @@ func FetchVintedItems(client *http.Client) ([]VintedItem, error) {
 		return nil, fmt.Errorf("reading response failed: %w", err)
 	}
 
-	var response VintedResponse
+	var response Response
 	if err := json.Unmarshal(body, &response); err != nil {
 		return nil, fmt.Errorf("JSON unmarshal failed: %w", err)
 	}
@@ -81,7 +56,21 @@ func FetchVintedItems(client *http.Client) ([]VintedItem, error) {
 	return response.Items, nil
 }
 
-func PrintItems(items []VintedItem) {
+func FindLatestItems(latestItemId int, items []Item) []Item {
+	var latestItems []Item
+
+	for _, item := range items {
+		if item.ID == latestItemId {
+			break
+		}
+		latestItems = append(latestItems, item)
+
+	}
+
+	return latestItems
+}
+
+func PrintItems(items []Item) {
 	for _, item := range items {
 		fmt.Printf("ID: %d\n", item.ID)
 		fmt.Printf("Title: %s\n", item.Title)
