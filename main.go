@@ -7,6 +7,8 @@ import (
 	"vinted-sniper/client"
 )
 
+const url = "https://www.vinted.co.uk/api/v2/catalog/items?page=1&per_page=96&global_search_session_id=28af41a9-f933-4e25-8be8-0ee50b6f1add&search_text=ugg%20men&catalog_ids=&order=relevance&size_ids=&brand_ids=&status_ids=&color_ids=&material_ids="
+
 func main() {
 	httpClient := &http.Client{}
 	var latestItemId int
@@ -22,7 +24,7 @@ func main() {
 				client.PrintItems(latestItems)
 			}
 			if len(items) > 0 {
-				latestItemId = items[0].ID
+				latestItemId = items[0].Id
 			}
 		}
 		// Wait for 10 seconds before next fetch
