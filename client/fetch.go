@@ -20,7 +20,7 @@ func FetchItems(client *http.Client, url string) ([]Item, error) {
 	}
 	defer resp.Body.Close()
 
-	// FIXED: Read response body for debugging before checking status
+	fmt.Println(resp.Status)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("reading response failed: %w", err)
