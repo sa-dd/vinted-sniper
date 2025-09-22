@@ -42,12 +42,12 @@ func CreateEmbed(items []client.Item) []*discordgo.MessageEmbed{
 			Title: item.Title,
 			Author: &discordgo.MessageEmbedAuthor{
 				Name: item.User.Name,
-				IconURL: item.User.Pic.URL,
+				IconURL: item.User.Pic.Url,
 			},
 			URL: item.Url,
 			Fields: embedFields,
 			Thumbnail: &discordgo.MessageEmbedThumbnail{
-				URL: item.Photo.Thumbnails[0].URL,
+				URL: item.Photo.Thumbnails[0].Url,
 			},
 		}
 		embedSlice = append(embedSlice, embed)
