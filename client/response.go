@@ -20,6 +20,7 @@ type Photo struct {
 
 type Item struct {
 	Id            int        `json:"favourite_count"`
+	Url           string 	 `json:"url"`
 	FavoriteCount int        `json:"favourite_count"`
 	Photo         Photo      `json:"photo"`
 	Price         Price      `json:"price"`
@@ -32,5 +33,3 @@ type Item struct {
 type Response struct {
 	Items []Item `json:"items"`
 }
-
-
