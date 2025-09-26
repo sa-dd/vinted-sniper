@@ -14,7 +14,7 @@ import (
 
 
 const (
-	url = "https://www.vinted.co.uk/api/v2/catalog/items?page=1&per_page=96&time=1758555430&global_search_session_id=ec9682e4-f6ed-4896-a2c7-b06ef138ab36&search_text=ugg%20tasman&currency=GBP&order=newest_first"
+	url = "https://www.vinted.co.uk/api/v2/catalog/items?page=1&per_page=96&time=1758555430&global_search_session_id=8d83c2b9-8740-424c-a6c1-943c66c6f1f4&search_text=ugg%20tasman&currency=GBP&order=newest_first"
 )
 
 var (
@@ -53,7 +53,7 @@ func main() {
 			latestItemId = items[0].Id
 		}
 
-		time.Sleep(60 * time.Second)
+		time.Sleep(40 * time.Second)
 	}
 
 	sc := make(chan os.Signal, 1)

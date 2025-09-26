@@ -7,12 +7,10 @@ import (
 	"vinted-sniper/client"
 )
 
-var (
-	embedSlice []*discordgo.MessageEmbed
-	embedFields []*discordgo.MessageEmbedField
-)
-
 func CreateEmbed(items []client.Item) []*discordgo.MessageEmbed{
+
+	var embedSlice []*discordgo.MessageEmbed
+	var embedFields []*discordgo.MessageEmbedField
 
 	for _, item := range items {
 		embedFields = []*discordgo.MessageEmbedField{
