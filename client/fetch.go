@@ -7,6 +7,29 @@ import (
 	"net/http"
 )
 
+const base_refresh = "https://www.vinted.co.uk/web/api/auth/refresh"
+
+func fetch_cookies(client *http.Client) error { 
+	
+	req, err := http.NewRequest("POST", base_refresh, nil)
+	if err != nil {
+		return fmt.Errorf("create request failed for session refresh: %w", err)
+	}
+
+	req.Header = Headers
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+	fmt.Println(resp.Status)
+
+	cookies := resp.Cookies()
+	AccessToken = cookies[0].Value
+	RefreshToken = cookies[1].Value
+
+	return nil
+}
+
 func FetchItems(client *http.Client, url string) ([]Item, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -21,6 +44,14 @@ func FetchItems(client *http.Client, url string) ([]Item, error) {
 	defer resp.Body.Close()
 
 	fmt.Println(resp.Status)
+	if resp.StatusCode == 401 {
+		err := fetch_cookies(client)
+		if err != nil {
+			return nil, fmt.Errorf("request failed for session refresh: %w", err)
+		}
+		return nil, fmt.Errorf("refreshing session")
+	}
+	
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("reading response failed: %w", err)
