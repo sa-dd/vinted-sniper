@@ -1,6 +1,5 @@
 package client
 
-
 type Thumbnail struct {
 	Url string `json:"url"`
 }
@@ -16,17 +15,17 @@ type ServiceFee struct {
 
 type Photo struct {
 	Thumbnails []Thumbnail `json:"thumbnails"`
-	Url string `json:"url"`
+	Url        string      `json:"url"`
 }
 
 type User struct {
 	Name string `json:"login"`
-	Pic Photo `json: "photo"`
+	Pic  Photo  `json: "photo"`
 }
 
 type Item struct {
 	Id            int        `json:"id"`
-	Url           string 	 `json:"url"`
+	Url           string     `json:"url"`
 	FavoriteCount int        `json:"favourite_count"`
 	Photo         Photo      `json:"photo"`
 	Price         Price      `json:"price"`
@@ -34,7 +33,7 @@ type Item struct {
 	Status        string     `json:"status"`
 	Title         string     `json:"title"`
 	SizeTitle     string     `json:"size_title"`
-	User 	  	User 	`json: "user"`
+	User          User       `json: "user"`
 }
 
 type Response struct {

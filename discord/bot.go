@@ -6,7 +6,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func Initiate() (*discordgo.Session, error){
+func Initiate() (*discordgo.Session, error) {
 
 	dg, err := discordgo.New("Token Here")
 	if err != nil {
