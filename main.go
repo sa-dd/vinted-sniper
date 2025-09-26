@@ -48,7 +48,7 @@ func main() {
 			latestItemId = items[0].Id
 		}
 
-		time.Sleep(40 * time.Second)
+		time.Sleep(60 * time.Second)
 	}
 
 	sc := make(chan os.Signal, 1)

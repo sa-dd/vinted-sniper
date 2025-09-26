@@ -26,7 +26,6 @@ func fetch_cookies(client *http.Client) error {
 	cookies := resp.Cookies()
 	AccessToken = cookies[0].Value
 	RefreshToken = cookies[1].Value
-
 	return nil
 }
 
@@ -37,6 +36,7 @@ func FetchItems(client *http.Client, url string) ([]Item, error) {
 	}
 
 	req.Header = Headers
+	req.Header.Set("Cookie", GetCookiesString())
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
@@ -78,4 +78,3 @@ func FindLatestItems(latestItemId int, items []Item) []Item {
 
 	return latestItems
 }
-
