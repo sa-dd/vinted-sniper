@@ -3,14 +3,12 @@ package client
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 )
 
 const base_refresh = "https://www.vinted.co.uk/web/api/auth/refresh"
 
 func fetch_cookies(client *http.Client) error {
-
 	req, err := http.NewRequest("POST", base_refresh, nil)
 	if err != nil {
 		return fmt.Errorf("create request failed for session refresh: %w", err)
@@ -30,39 +28,18 @@ func fetch_cookies(client *http.Client) error {
 }
 
 func FetchItems(client *http.Client, url string) ([]Item, error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("create request failed: %w", err)
-	}
+	body, err := Get(url)
 
-	req.Header = Headers
-	req.Header.Set("Cookie", GetCookiesString())
-	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
-	defer resp.Body.Close()
 
-	fmt.Println(resp.Status)
-	if resp.StatusCode == 401 {
-		err := fetch_cookies(client)
-		if err != nil {
-			return nil, fmt.Errorf("request failed for session refresh: %w", err)
-		}
-		return nil, fmt.Errorf("refreshing session")
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("reading response failed: %w", err)
-	}
-
-	var response Response
-	if err := json.Unmarshal(body, &response); err != nil {
+	var parsedResponse Response
+	if err := json.Unmarshal(body, &parsedResponse); err != nil {
 		return nil, fmt.Errorf("JSON unmarshal failed: %w", err)
 	}
 
-	return response.Items, nil
+	return parsedResponse.Items, nil
 }
 
 func FindLatestItems(latestItemId int, items []Item) []Item {

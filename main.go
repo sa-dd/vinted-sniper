@@ -48,6 +48,11 @@ func main() {
 			latestItemId = items[0].Id
 		}
 
+		_, notifErr := client.FetchNotifications(httpClient)
+		if notifErr != nil {
+			fmt.Printf("Error fetching notifications: %v\n", notifErr)
+		}
+
 		time.Sleep(60 * time.Second)
 	}
 
