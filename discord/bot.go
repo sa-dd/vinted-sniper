@@ -2,12 +2,13 @@ package discord
 
 import (
 	"log"
+	"os"
 	"github.com/bwmarrin/discordgo"
 )
 
 func Init() (*discordgo.Session, error) {
 
-	dg, err := discordgo.New("DISCORD_TOKEN")
+	dg, err := discordgo.New(os.Getenv("DISCORD_TOKEN"))
 	if err != nil {
 		log.Println("Error initializing Bot instance: ", err)
 	}
