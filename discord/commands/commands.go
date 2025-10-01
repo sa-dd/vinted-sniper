@@ -1,22 +1,21 @@
 package commands
 
 import (
-    "vinted-sniper/discord/types"
-    "github.com/bwmarrin/discordgo"
-
+	"github.com/bwmarrin/discordgo"
+	"vinted-sniper/discord/types"
 )
 
 var CommandRegistry = map[string]types.Command{
-	"search":{
+	"search": {
 		Definition: Search,
-		Handler: SearchHandler,
+		Handler:    SearchHandler,
 	},
 }
 
 func GetAllCommands() []*discordgo.ApplicationCommand {
-    var commands []*discordgo.ApplicationCommand
-    for _, cmd := range CommandRegistry {
-        commands = append(commands, cmd.Definition)
-    }
-    return commands
+	var commands []*discordgo.ApplicationCommand
+	for _, cmd := range CommandRegistry {
+		commands = append(commands, cmd.Definition)
+	}
+	return commands
 }
