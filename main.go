@@ -23,7 +23,7 @@ var (
 func main() {
 
 	httpClient := &http.Client{}
-	dg, err := discord.Initiate()
+	dg, err := discord.Init()
 	if err != nil {
 		log.Println("Error initializing Bot instance: ", err)
 	}
