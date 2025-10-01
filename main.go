@@ -10,6 +10,7 @@ import (
 	"time"
 	"vinted-sniper/client"
 	"vinted-sniper/discord"
+	"vinted-sniper/discord/handlers"
 )
 
 const (
@@ -56,5 +57,7 @@ func main() {
 	<-sc
 
 	dg.Close()
+
+	handlers.UnregisterSlashCommands(dg, "")
 
 }
