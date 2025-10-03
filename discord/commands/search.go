@@ -1,8 +1,10 @@
 package commands
 
 import (
-	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"strings"
+	"vintsnipe"
+	"vintsnipe/global"
 )
 
 var Search = &discordgo.ApplicationCommand{
@@ -36,19 +38,28 @@ var Search = &discordgo.ApplicationCommand{
 
 func SearchHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
+	var channelID string
+
 	options := i.ApplicationCommandData().Options
 
 	guildId := s.State.Ready.Guilds[0].ID
-	channelName := options[0].Value.(string) + " pol"
-	flag := options[1].Value.(bool)
-	fmt.Println(guildId)
-	if flag {
-		s.GuildChannelCreateComplex(guildId, discordgo.GuildChannelCreateData{
+	createChannel := options[1].Value.(bool)
+	search := strings.Replace(options[0].Value.(string), " ", "%20", 1)
+
+	if createChannel {
+		channelName := options[0].Value.(string) + " pol"
+		ch, _ := s.GuildChannelCreateComplex(guildId, discordgo.GuildChannelCreateData{
 			Name:     channelName,
 			Type:     discordgo.ChannelTypeGuildText,
 			ParentID: "1423023839847256155",
 		})
+
+		channelID = ch.ID
 	}
+
+	pol, _ := vintsnipe.CreatePol(channelID, search)
+
+	global.PolSlice = append(global.PolSlice, pol)
 
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,

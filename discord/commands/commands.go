@@ -2,7 +2,7 @@ package commands
 
 import (
 	"github.com/bwmarrin/discordgo"
-	"vinted-sniper/discord/types"
+	"vintsnipe/discord/types"
 )
 
 var CommandRegistry = map[string]types.Command{

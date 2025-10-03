@@ -4,7 +4,7 @@ import (
     "log"
 
     "github.com/bwmarrin/discordgo"
-    "vinted-sniper/discord/commands"
+    "vintsnipe/discord/commands"
 )
 
 func RegisterSlashCommands(s *discordgo.Session, guildID string) {

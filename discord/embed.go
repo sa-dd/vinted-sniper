@@ -3,7 +3,7 @@ package discord
 import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
-	"vinted-sniper/client"
+	"vintsnipe/client"
 )
 
 func CreateEmbed(items []client.Item) []*discordgo.MessageEmbed {

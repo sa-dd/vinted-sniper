@@ -11,7 +11,7 @@ var (
 )
 
 func GetCookiesString() string {
-	return fmt.Sprintf("access_token_web=%s; refresh_token_web=%s; cf_clearance=_pzjkEjDziR.c.2RJK5_rnYYh4Z6Gkl4qzneMW9TRCw-1758904946-1.2.1.1-rRsLuTI_ZSGkP4Afn9JpQ0sT5T0VV0PwmAs9uSD58TRQZZD1guoQf8Atd3ljpnSvQE9KZ9PMugu1Cd7594zWGUcYYJFLo6b9VAsUai09DEOCckbWh9KiMKkHQSJHCu.wscmfT1mmbvOX8jO3OgH78q4ZaDQW6c5NBSsg4kZQActi_v3aAl5kJPhvIzsUoSVQvqyCDs9KaRNDiw0D.K0SFq33UIRtcmiImWhKF9D46UU;", AccessToken, RefreshToken)
+	return fmt.Sprintf("access_token_web=%s; refresh_token_web=%s; cf_clearance=5VfTn3zuMEnMf_r2DBWmilQ6fr9wxJVIJOaSwPuXNYc-1759380868-1.2.1.1-Sio_uFiYh8Oo0athtPtlW0BtS.OKNaMfldgbaOw5mUS3kIV7fKxuij4s29Li3HVsfKLQb41wpNNd2.YEFRHPL4XTYAeuOcAyFJy3mX9btOAlY64cVcjss.zR6_vzXqMawydpPqORefEqrQTgr.CdKdzGZArd.GuuBUzviLTiK9N4SS11XZMnN6bLPWoVBEwIy8Ms6OnkrkqSWgbe5LwW4OCdyCFV9UeBYswVbJmYlxU;", AccessToken, RefreshToken)
 }
 
 var Headers = http.Header{

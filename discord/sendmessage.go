@@ -6,12 +6,12 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func SendNotif(dg *discordgo.Session, embeds []*discordgo.MessageEmbed) {
+func SendNotif(dg *discordgo.Session, embeds []*discordgo.MessageEmbed, channelID string) {
 
-	dg.ChannelMessageSend("1420459536124215386", "NiggaThrum")
+	dg.ChannelMessageSend(channelID, "NiggaThrum")
 	//log.Println("Sending : ",  len(embeds))
 	if len(embeds) < 10 {
-		_, err := dg.ChannelMessageSendEmbeds("1420459536124215386", embeds)
+		_, err := dg.ChannelMessageSendEmbeds(channelID, embeds)
 		if err != nil {
 			log.Println("Error sending Embeds: ", err)
 		}

@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 	"github.com/bwmarrin/discordgo"
-	"vinted-sniper/discord/handlers"
+	"vintsnipe/discord/handlers"
 )
 
 func Init() (*discordgo.Session, error) {

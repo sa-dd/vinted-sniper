@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"vintsnipe"
 )
 
 const base_refresh = "https://www.vinted.co.uk/web/api/auth/refresh"
@@ -29,14 +30,8 @@ func fetch_cookies(client *http.Client) error {
 	return nil
 }
 
-func FetchItems(client *http.Client, url string) ([]Item, error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("create request failed: %w", err)
-	}
+func FetchItems(client *http.Client, req *http.Request) ([]Item, error) {
 
-	req.Header = Headers
-	req.Header.Set("Cookie", GetCookiesString())
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
@@ -49,6 +44,8 @@ func FetchItems(client *http.Client, url string) ([]Item, error) {
 		if err != nil {
 			return nil, fmt.Errorf("request failed for session refresh: %w", err)
 		}
+
+		req.Header.Set("Cookie", GetCookiesString())
 		return nil, fmt.Errorf("refreshing session")
 	}
 
@@ -77,4 +74,28 @@ func FindLatestItems(latestItemId int, items []Item) []Item {
 	}
 
 	return latestItems
+}
+
+func CreatePol(channelID string, search string) (*vintsnipe.Pol, error) {
+
+	client := &http.Client{}
+	url := fmt.Sprintf("https://www.vinted.co.uk/api/v2/catalog/items?page=1&per_page=96&time=1758555430&global_search_session_id=8d83c2b9-8740-424c-a6c1-943c66c6f1f4&search_text=%s&currency=GBP&order=newest_first", search)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		//fmt.Errorf("failed to create a new request: ", err)
+		return nil, err
+	}
+	req.Header = Headers
+	req.Header.Set("Cookie", GetCookiesString())
+
+	var Pol = &vintsnipe.Pol{
+		Request:      req,
+		Client:       client,
+		ChannelID:    channelID,
+		LatestItemID: 0,
+	}
+
+	return Pol, err
+
 }
