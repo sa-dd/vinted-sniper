@@ -25,7 +25,7 @@ func CreateEmbed(items []client.Item) []*discordgo.MessageEmbed {
 			},
 			{
 				Name:   "Price",
-				Value:  item.Price.Amount,
+				Value:   item.Price.Amount,
 				Inline: true,
 			},
 			{

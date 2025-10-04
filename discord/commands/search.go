@@ -1,10 +1,10 @@
 package commands
 
 import (
+	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"strings"
 	"vintsnipe"
-	"fmt"
 )
 
 var Search = &discordgo.ApplicationCommand{
@@ -33,6 +33,24 @@ var Search = &discordgo.ApplicationCommand{
 				},
 			},
 		},
+		{
+			Type:        discordgo.ApplicationCommandOptionString,
+			Name:        "filter",
+			Description: "Add relevent filters to item categories",
+			Required:    true,
+			Choices: []*discordgo.ApplicationCommandOptionChoice{
+				{
+					Name:  "price",
+					Value: "price",
+				},
+			},
+		},
+		{
+			Type:        discordgo.ApplicationCommandOptionNumber,
+			Name:        "amount",
+			Description: "Any item greater than this amount will be omitted",
+			Required:    true,
+		},
 	},
 }
 
@@ -45,9 +63,10 @@ func SearchHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	guildId := s.State.Ready.Guilds[0].ID
 	createChannel := options[1].Value.(bool)
 	search := strings.Replace(options[0].Value.(string), " ", "%20", 1)
+	channelName := options[0].Value.(string)
 
 	if createChannel {
-		channelName := options[0].Value.(string) + " pol"
+		channelName = options[0].Value.(string) + " pol"
 		ch, _ := s.GuildChannelCreateComplex(guildId, discordgo.GuildChannelCreateData{
 			Name:     channelName,
 			Type:     discordgo.ChannelTypeGuildText,
@@ -57,10 +76,21 @@ func SearchHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		channelID = ch.ID
 	}
 
-	pol,err := vintsnipe.Create(channelID, search)
+	filter := &vintsnipe.Filter{}
+	filter.Type = options[2].Value.(string)
+
+	switch filter.Type {
+	case "price":
+		filter.Value = options[3].FloatValue()
+
+	default:
+		filter = nil
+	}
+
+	pol, err := vintsnipe.Create(filter, channelID, search)
 	if err != nil {
 		fmt.Errorf("failed to create a new poll: ", err)
-		return 
+		return
 	}
 
 	vintsnipe.PolSlice = append(vintsnipe.PolSlice, pol)
@@ -68,7 +98,7 @@ func SearchHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "New search url created",
+			Content: fmt.Sprintf("New poll added to %s channel with %s filter set to %v", channelName, filter.Type, filter.Value.(float64)),
 		},
 	})
 
