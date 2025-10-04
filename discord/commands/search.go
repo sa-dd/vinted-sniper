@@ -4,7 +4,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"strings"
 	"vintsnipe"
-	"vintsnipe/global"
+	"fmt"
 )
 
 var Search = &discordgo.ApplicationCommand{
@@ -57,9 +57,13 @@ func SearchHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		channelID = ch.ID
 	}
 
-	pol, _ := vintsnipe.CreatePol(channelID, search)
+	pol,err := vintsnipe.Create(channelID, search)
+	if err != nil {
+		fmt.Errorf("failed to create a new poll: ", err)
+		return 
+	}
 
-	global.PolSlice = append(global.PolSlice, pol)
+	vintsnipe.PolSlice = append(vintsnipe.PolSlice, pol)
 
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,

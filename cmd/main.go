@@ -8,9 +8,9 @@ import (
 	"syscall"
 	"time"
 	"vintsnipe/client"
+	"vintsnipe"
 	"vintsnipe/discord"
 	"vintsnipe/discord/handlers"
-	"vintsnipe/global"
 )
 
 func main() {
@@ -21,9 +21,8 @@ func main() {
 	}
 
 	for {
-		//fmt.Println(global.PolSlice)
 
-		for _, i := range global.PolSlice {
+		for _, i := range vintsnipe.PolSlice {
 			items, err := client.FetchItems(i.Client, i.Request)
 			if err != nil {
 				fmt.Printf("Error fetching items: %v\n", err)
