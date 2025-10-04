@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 const base_refresh = "https://www.vinted.co.uk/web/api/auth/refresh"
@@ -24,7 +25,6 @@ func fetch_cookies(client *http.Client) error {
 	fmt.Println(resp.Status)
 
 	cookies := resp.Cookies()
-	fmt.Println(cookies)
 	AccessToken = cookies[0].Value
 	RefreshToken = cookies[1].Value
 	return nil
@@ -62,17 +62,26 @@ func FetchItems(client *http.Client, req *http.Request) ([]Item, error) {
 	return response.Items, nil
 }
 
-func FindLatestItems(latestItemId int, items []Item) []Item {
+func FindLatestItems(f string, fv interface{}, latestItemId int, items []Item) []Item {
 	var latestItems []Item
 
 	for _, item := range items {
+		amount, _ := strconv.ParseFloat(item.Price.Amount, 64)
 		if item.Id == latestItemId {
 			break
 		}
-		latestItems = append(latestItems, item)
+
+		switch f {
+		case "price":
+			if amount < fv.(float64) {
+
+				latestItems = append(latestItems, item)
+			}
+		default:
+			latestItems = append(latestItems, item)
+		}
 
 	}
 
 	return latestItems
 }
-

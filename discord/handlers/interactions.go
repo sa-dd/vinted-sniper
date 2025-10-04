@@ -16,6 +16,7 @@ func InteractionHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 func handleSlashCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
     commandName := i.ApplicationCommandData().Name
+    log.Printf(commandName)
     
     if cmd, exists := commands.CommandRegistry[commandName]; exists {
         cmd.Handler(s, i)

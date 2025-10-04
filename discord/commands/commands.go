@@ -10,6 +10,10 @@ var CommandRegistry = map[string]types.Command{
 		Definition: Search,
 		Handler:    SearchHandler,
 	},
+	"filter": {
+		Definition: Filter,
+		Handler:    FilterHandler,
+	},
 }
 
 func GetAllCommands() []*discordgo.ApplicationCommand {

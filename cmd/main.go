@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	"vintsnipe/client"
 	"vintsnipe"
+	"vintsnipe/client"
 	"vintsnipe/discord"
 	"vintsnipe/discord/handlers"
 )
@@ -29,7 +29,7 @@ func main() {
 			}
 
 			if i.LatestItemID != 0 {
-				latestItems := client.FindLatestItems(i.LatestItemID, items)
+				latestItems := client.FindLatestItems(i.Filter.Type, i.Filter.Value, i.LatestItemID, items)
 				fmt.Println(fmt.Sprintf("Latest item ID: %d", i.LatestItemID))
 				fmt.Println(fmt.Sprintf("Latest Items: %d", len(latestItems)))
 				if len(latestItems) != 0 {
@@ -42,7 +42,7 @@ func main() {
 				i.LatestItemID = items[0].Id
 			}
 
-		time.Sleep(60 * time.Second)
+			time.Sleep(60 * time.Second)
 		}
 
 	}
