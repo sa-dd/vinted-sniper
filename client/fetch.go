@@ -24,19 +24,14 @@ func fetch_cookies(client *http.Client) error {
 	fmt.Println(resp.Status)
 
 	cookies := resp.Cookies()
+	fmt.Println(cookies)
 	AccessToken = cookies[0].Value
 	RefreshToken = cookies[1].Value
 	return nil
 }
 
-func FetchItems(client *http.Client, url string) ([]Item, error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("create request failed: %w", err)
-	}
+func FetchItems(client *http.Client, req *http.Request) ([]Item, error) {
 
-	req.Header = Headers
-	req.Header.Set("Cookie", GetCookiesString())
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
@@ -49,6 +44,8 @@ func FetchItems(client *http.Client, url string) ([]Item, error) {
 		if err != nil {
 			return nil, fmt.Errorf("request failed for session refresh: %w", err)
 		}
+
+		req.Header.Set("Cookie", GetCookiesString())
 		return nil, fmt.Errorf("refreshing session")
 	}
 
@@ -78,3 +75,4 @@ func FindLatestItems(latestItemId int, items []Item) []Item {
 
 	return latestItems
 }
+
